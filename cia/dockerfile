@@ -1,0 +1,32 @@
+# Use an official OpenJDK runtime as a parent image
+FROM openjdk:17-jdk-slim as builder
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the local pom.xml to the container
+COPY pom.xml .
+
+# Download all the dependencies (we do this in a separate step to leverage Docker cache)
+RUN mvn dependency:go-offline
+
+# Copy the rest of the project files to the container
+COPY src ./src
+
+# Package the application into a JAR file
+RUN mvn clean package -DskipTests
+
+# Start a new image from a smaller OpenJDK image
+FROM openjdk:17-jdk-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the JAR file built from the previous image
+COPY --from=builder /app/target/microservice-1-0.0.1-SNAPSHOT.jar microservice-1.jar
+
+# Expose port 8080 (default for Spring Boot)
+EXPOSE 8080
+
+# Run the Spring Boot application
+ENTRYPOINT ["java", "-jar", "microservice-1.jar"]
