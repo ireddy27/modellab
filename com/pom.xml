@@ -6,6 +6,15 @@
   <artifactId>com</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
+  <build>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <version>3.1.2</version>
+          </plugin>
+      </plugins>
+  </build>
 
   <name>com</name>
   <url>http://maven.apache.org</url>
