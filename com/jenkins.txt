@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'master', description: 'Branch to build')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    // Checkout the specified branch
+                    git branch: "${params.BRANCH_NAME}", url: 'https://github.com/ireddy27/modellab.git'
+                }
+            }
+        }
+        stage('Build') {
+    steps {
+        dir('com') { // Change to the directory where pom.xml is located
+            script {
+                // Build the application using Maven
+                sh 'mvn clean package'
+            }
+        }
+    }
+}
+
+        stage('Test') {
+            steps {
+              dir('com') {  
+                script {
+                    // Run Maven tests
+                    sh 'mvn test'
+                }
+              }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                dir('com') {  
+                script {
+                    // Build the Docker image
+                    sh 'docker build -t ireddy27/lab3:latest .'
+                }
+            }
+            }
+        }
+        stage('Push to Registry') {
+            steps {
+                dir('com') { 
+                script {
+                    // Push the image to Docker Hub
+                    sh 'docker push ireddy27/lab3:latest'
+                }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Build and push succeeded!'
+        }
+        failure {
+            echo 'Build failed.'
+        }
+    }
+}
