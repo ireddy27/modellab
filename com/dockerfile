@@ -9,7 +9,7 @@ RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-RUN ls -l /app 
+RUN ls -l /app/target 
 
 # Stage 2: Create the runtime image
 FROM openjdk:11-jre-slim
