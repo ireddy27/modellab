@@ -1,33 +1,27 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-slim as builder
-FROM maven:3.8.5-openjdk-11 AS builder
+# Use a base image for the build
+FROM maven:3.8.5-openjdk-17 AS build
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the local pom.xml to the container
+# Copy the pom.xml and src directory
 COPY pom.xml .
-
-# Download all the dependencies (we do this in a separate step to leverage Docker cache)
-RUN mvn dependency:go-offline
-
-# Copy the rest of the project files to the container
 COPY src ./src
 
-# Package the application into a JAR file
+# Build the application
 RUN mvn clean package -DskipTests
 
-# Start a new image from a smaller OpenJDK image
-FROM openjdk:17-jdk-slim
+# Use a new stage to build the final image
+FROM openjdk:17-jdk-slim AS runtime
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the JAR file built from the previous image
+# Copy the JAR file from the builder stage
 COPY --from=build /app/target/microservice-1-0.0.1-SNAPSHOT.jar microservice-1.jar
 
-# Expose port 8080 (default for Spring Boot)
-EXPOSE 8082
+# Change the exposed port
+EXPOSE 8081
 
-# Run the Spring Boot application
+# Run the application
 ENTRYPOINT ["java", "-jar", "microservice-1.jar"]
