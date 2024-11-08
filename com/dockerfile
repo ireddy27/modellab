@@ -15,7 +15,7 @@ RUN ls -l /app/target
 FROM openjdk:11-jre-slim
 
 # Copy the JAR from the build stage (update the path as needed)
-COPY --from=build /app/target/com.0.0.1-SNAPSHOT.jar /microservice-1.jar
+COPY --from=build /app/target/com-0.0.1-SNAPSHOT.jar /microservice-1.jar
 
 EXPOSE 8080
 
