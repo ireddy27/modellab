@@ -19,7 +19,9 @@ FROM openjdk:17-jdk-slim AS runtime
 WORKDIR /app
 
 # Copy the JAR file from the builder stage
-COPY --from=build /app/target/microservice-1-0.0.1-SNAPSHOT.jar microservice-1.jar
+FROM openjdk:11-jre-slim
+COPY --from=build /app/target/microservice-1-0.0.1-SNAPSHOT.jar /microservice-1.jar
+
 
 # Change the exposed port
 EXPOSE 8081
